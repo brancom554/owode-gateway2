@@ -2282,7 +2282,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 
 
-axios__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.baseURL = 'http://owode-api/api/v1';
+axios__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.baseURL = 'http://testowodeapi.mydko-sarl.com/api/v1';
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "Payment_Paydunya",
   created: function created() {
@@ -2292,7 +2292,7 @@ axios__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.baseURL = 'http://owode-ap
     payWithPaydunya: function payWithPaydunya(btn) {
       PayDunya.setup({
         selector: jquery__WEBPACK_IMPORTED_MODULE_0___default()(btn),
-        url: "http://192.168.100.5/paydunya.php/" + this.$route.params.id + "/?token=" + this.$route.params.token,
+        url: "http://testowodegateway.mydko-sarl.com/paydunya.php/" + this.$route.params.id + "/?token=" + this.$route.params.token,
         method: "GET",
         displayMode: PayDunya.DISPLAY_IN_POPUP,
         beforeRequest: function beforeRequest() {
