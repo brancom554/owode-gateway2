@@ -1,0 +1,1 @@
+{"status":"not_paid","message":"Not paid yet. Do not release your item."}

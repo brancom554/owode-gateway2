@@ -1,0 +1,213 @@
+<div class="pt-4 mb-5 container" id="lwCheckoutForm">
+        <div class="row">
+            <div class="col-md-4 lw-logo-section">
+                <!-- Payment page logo -->
+                <div class="lw-logo-container">
+                    <img class="lw-logo" src="assets/imgs/logo-for-site.png">
+                </div>
+                <!-- /Payment page logo -->
+                <!-- Payment Page Other Information -->
+                <h5>Pay with owode</h5>
+                <hr class="mb-4">
+                <h6>wwjwjwj </h6>
+                <h6>wjwjwjjss</h6>
+                <h6>Msssjjsjs</h6>
+                <h6>jfljnlfdjvn dsljvndslvjn</h6>
+                <!-- Payment Page Other Information -->
+                <hr class="mb-4">
+                <div class="form-group">
+                    <label for="individualPaymentGateway">Owode payment gateway</label>
+                    <select class="form-control" id="individualPaymentGateway">
+                        <option value="" selected>All</option>
+                        <option value="owode">owode</option>
+                      
+                        
+                    </select>
+                </div>
+
+            </div>
+            <!-- col-md-8 -->
+            <div class="col-md-8">
+                <!-- payment gateway start -->
+                <form method="post" id="lwPaymentForm">
+                    <!-- Card Start here -->
+                    <div class="card">
+                        <!-- Payment Page header -->
+                        <div class="card-header">
+                            <h3 class="text-center">Complete your payment</h3>
+                        </div>
+                        <!-- /Payment Page header -->
+
+                        <!-- Card body start here -->
+                        <div class="card-body">
+                            <!-- Info Message -->
+                            <div class="alert alert-info">
+                                This is just an example, you can integrate these payment gateway easily using this example implementation.
+                            </div>
+                            <!-- Info Message -->
+
+                            <!-- show validation message block -->
+                            <div id="lwValidationMessage" class="lw-validation-message"></div>
+                            <!-- / show validation message block -->
+                            <?php 
+                                // Get config data
+                                $configData = configItem();
+                                $userDetails = [
+                                    'amounts' => [ // at least one currency amount is required
+                                        'USD'   => 10,
+                                        'INR'   => 709,
+                                        'NGN'   => 3615,
+                                        'TRY'   => 57
+                                    ],
+                                    'order_id'      => 'ORDS' . uniqid(), // required in instamojo, Iyzico, owode, Paytm gateways
+                                    'customer_id'   => 'CUSTOMER' . uniqid(), // required in Iyzico, Paytm gateways
+                                    'item_name'     => 'Sample Product', // required in owode gateways
+                                    'item_qty'      => 1,
+                                    'item_id'       => 'ITEM' . uniqid(), // required in Iyzico, Paytm gateways
+                                    'payer_email'   => 'sample@domain.com', // required in instamojo, Iyzico, Stripe gateways
+                                    'payer_name'    => 'John Doe', // required in instamojo, Iyzico gateways
+                                    'description'   => 'Lorem ipsum dolor sit amet, constetur adipisicing', // Required for stripe
+                                    'ip_address'    => getUserIpAddr(), // required only for iyzico 
+                                    'address'       => '3234 Godfrey Street Tigard, OR 97223', // required in Iyzico gateways
+                                    'city'          => 'Tigard',  // required in Iyzico gateways
+                                    'country'       => 'United States' // required in Iyzico gateways
+                                ];
+
+                                if (!$configData) {
+                                    // If config data not found then show error
+                                    echo '<div class="alert alert-warning text-center">Unable to load configuration.</div>';
+                                } else {
+                                    // Get Gateway configuration
+                                    $configItem = $configData['payments']['gateway_configuration'];
+                                ?>
+
+                                <ul class="list-group">
+                                    <li class="list-group-item">
+                                        <h3>Customer Details</h3>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>Name:</strong> <?= $userDetails['payer_name'] ?>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>Email:</strong> <?= $userDetails['payer_email'] ?>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>Address:</strong> <?= $userDetails['address'] ?>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>City:</strong> <?= $userDetails['city'] ?>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>Country:</strong> <?= $userDetails['country'] ?>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>Additional info:</strong> <?= $userDetails['description'] ?>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>Item Name:</strong> <?= $userDetails['item_name'] ?>
+                                    </li>
+                                </ul>
+
+                                <h5 class="mt-4">Choose your payment method</h5>
+                                <hr>
+                                <?php
+                                    // Show all enable payment Gateway
+                                    foreach ($configItem as $key => $value) { 
+                                        // Check if payment gateway is enable from config
+                                        if ($value['enable']) { ?>
+                                            <!-- Payment gateway radio buttons with image -->
+                                            <div class="form-check form-check-inline">
+                                                <!-- radio button label -->
+                                                <label class="form-check-label" for="paymentOption-<?= $key ?>">
+                                                    <!-- Filedset for big image -->
+                                                    <fieldset class="lw-fieldset mr-3 mb-3">
+                                                        <!-- small image legend -->
+                                                        <legend class="lw-fieldset-legend-font">
+                                                            <input class="form-check-input" type="radio" required="true" id="paymentOption-<?= $key ?>" name="paymentOption" value="<?= $key ?>">
+                                                            <!-- payment gateway small image --> 
+                                                            <img class="lw-payment-gateway-icon-small" src="assets/imgs/payment-images/<?= $key ?>-small.png">
+                                                            <!-- /payment gateway small image --> 
+                                                        </legend>
+                                                        <!-- /small image legend -->
+                                                        <!-- payment gateway big image --> 
+                                                        <img class="lw-payment-gateway-icon" src="assets/imgs/payment-images/<?= $key ?>-big.jpg">
+                                                        <!-- /payment gateway big image --> 
+                                                    </fieldset>
+                                                    <!-- /Filedset for big image -->
+                                                </label>
+                                                <!-- /radio button label -->
+                                            </div> <?php 
+                                            // Payment gateway radio buttons with image
+                                        }
+                                    } ?>
+                                <br><br>
+                                <!-- Iyzico Merchant Form Start here -->
+                                <div class="lw-iyzico-form card mb-3" id="cardCheckoutForm">
+                                    <!-- Iyzico payment method header -->
+                                    <div class="card-header">
+                                        <h5 class="card-title display-td" >Your Card Details</h5>
+                                        <small class="text-danger">All fields are required.</small>
+                                    </div>
+                                    <!-- /Iyzico payment method header -->
+
+                                    <!-- Card Body start here -->
+                                    <div class="card-body mb-3">                                        
+                                        <!-- name of card -->
+                                        <div class="form-group">
+                                            <label for="cname">Name on Card</label>
+                                            <input type="text" class="form-control" id="cname" name="cardname" placeholder="John More Doe">
+                                        </div>
+                                        <!-- / name of card -->
+
+                                        <!-- Card number -->
+                                        <div class="form-group">
+                                            <label for="cardNumber">Card Number</label>
+                                            <div class="input-group">
+                                                <input type="number" class="form-control" id="cardNumber" name="cardnumber">
+                                                <div class="input-group-append" id="basic-addon1">
+                                                    <span class="input-group-text"><i class="fa fa-credit-card"></i>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- / Card number -->                                        
+
+                                        <div class="form-row">
+                                            <div class="col">
+                                                <!-- Set card expiry month -->
+                                                <label for="expmonth">Exp Month</label>
+                                                <input type="number" class="form-control" id="expmonth" name="expmonth">
+                                                <!-- / Set card expiry month -->
+                                            </div>
+                                            <div class="col">
+                                                <!-- Set card expiry year -->
+                                                <label for="expyear">Exp Year</label>
+                                                <input type="number" class="form-control" id="expyear" name="expyear">
+                                                <!-- / Set card expiry year -->
+                                            </div>
+                                            <div class="col">
+                                                <!-- Set card cvv number -->
+                                                <label for="cvv">CVV</label>
+                                                <input type="number" class="form-control" id="cvv" name="cvv">
+                                                <!-- Set card cvv number -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- /Card Body start here -->
+                                </div>
+                                <!-- / Iyzico Merchant Form  -->
+                                <h3 id="lwPaymentAmount"></h3>
+                                <!--  checkout form submit button -->
+                                <button type="submit" value="Proceed to Pay" class="btn btn-lg btn-block btn-success">Proceed to Pay</button>
+                                <!-- / checkout form submit button -->
+                            </div><?php } ?>
+                            <!-- Card body end here -->
+                        </div>
+                        <!-- /Card end here -->
+                    </div>
+                    <!-- /col-md-8 -->
+                </form>
+                <!-- /payment gateway end -->
+            </div>
+        </div>
+    </div>
