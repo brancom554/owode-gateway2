@@ -2276,23 +2276,32 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _router__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../router */ "./views/assets/router/index.js");
 //
 //
 //
 //
 
 
-axios__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.baseURL = 'http://testowodeapi.mydko-sarl.com/api/v1';
+ //axios.defaults.baseURL = 'http://owode-api.bj/api/v1';
+
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "Payment_Paydunya",
+  data: function data() {
+    return {
+      transaction: '',
+      errors: []
+    };
+  },
   created: function created() {
     this.payWithPaydunya(this);
   },
   methods: {
     payWithPaydunya: function payWithPaydunya(btn) {
+      var transaction = this.$route.params.id;
       PayDunya.setup({
         selector: jquery__WEBPACK_IMPORTED_MODULE_0___default()(btn),
-        url: "http://testowodegateway.mydko-sarl.com/paydunya.php/" + this.$route.params.id + "/?token=" + this.$route.params.token,
+        url: "http://testowodegateway.mydko-sarl.compay/dunya.php/" + this.$route.params.id + "/?token=" + this.$route.params.token,
         method: "GET",
         displayMode: PayDunya.DISPLAY_IN_POPUP,
         beforeRequest: function beforeRequest() {
@@ -2305,30 +2314,44 @@ axios__WEBPACK_IMPORTED_MODULE_1___default.a.defaults.baseURL = 'http://testowod
           console.log(ref);
           console.log(token);
           console.log(status);
-
-          if (status == 'completed') {
-            var stat = 'Success';
-            axios__WEBPACK_IMPORTED_MODULE_1___default.a.post('/transaction/paymentStatus', {
-              transaction: this.$route.params.id,
-              statut: stat
-            }).then(function (data) {
-              if (data.erroMessage == 'Success') {
-                this.$route.push('/success');
+          setTimeout(function () {
+            console.log(token);
+            axios__WEBPACK_IMPORTED_MODULE_1___default.a.get('https://app.paydunya.com/sandbox-api/v1/checkout-invoice/confirm/' + token, {
+              headers: {
+                'PAYDUNYA-MASTER-KEY': 'KeNaNWkz-TILV-N4MG-buyH-Mc4fkE9Y54Fc',
+                'PAYDUNYA-PRIVATE-KEY': 'live_private_xACzzgzZGr3aFlCbJbEbWSzmo5x',
+                'PAYDUNYA-TOKEN': '2TWzJ13pGOBvBfLS3l8i'
               }
-            });
-          }
+            }).then(function (response) {
+              console.log(JSON.stringify(response.data));
 
-          if (status == 'failed' || status == 'cancelled') {
-            var _stat = 'Blocked';
-            axios__WEBPACK_IMPORTED_MODULE_1___default.a.post('/transaction/paymentStatus', {
-              transaction: this.$route.params.id,
-              statut: _stat
-            }).then(function (data) {
-              if (data.erroMessage == 'Success') {
-                this.$route.push('/echec');
+              if (response.data.status === 'completed') {
+                var stat = 'Success';
+                axios__WEBPACK_IMPORTED_MODULE_1___default.a.post('http://testowodeapi.mydko-sarl.com/api/v1/transactions/paymentStatus', {
+                  transaction: transaction,
+                  statut: stat
+                }).then(function (data) {
+                  if (data.erroMessage == 'Success') {
+                    _router__WEBPACK_IMPORTED_MODULE_2__["default"].push('/success');
+                  }
+                });
               }
+
+              if (response.data.status === 'failed' || status === 'cancelled') {
+                var _stat = 'Blocked';
+                axios__WEBPACK_IMPORTED_MODULE_1___default.a.post('http://testowodeapi.mydko-sarl.com/api/v1/transactions/paymentStatus', {
+                  transaction: transaction,
+                  statut: _stat
+                }).then(function (data) {
+                  if (data.erroMessage == 'Success') {
+                    _router__WEBPACK_IMPORTED_MODULE_2__["default"].push('/echec');
+                  }
+                });
+              }
+            })["catch"](function (error) {
+              console.log(error);
             });
-          }
+          }, 7000, token);
         },
         onError: function onError(error) {
           alert("Unknown Error ==> ", error.toString());
