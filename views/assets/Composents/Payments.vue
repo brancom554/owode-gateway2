@@ -10,7 +10,7 @@
     //axios.defaults.baseURL = 'http://owode-api.bj/api/v1';
 
     export default {
-        name:"Payment_Paydunya_tontine",
+        name:"Payment_Paydunya",
         data: function (){
             return{
                 transaction:'',
@@ -60,7 +60,7 @@
                                                 if(data.data.data.errorMessage == 'Success'){
                                                     $('.vbox-overlay').addClass('d-none')
                                                         /*router.push('/payment.php/success')*/
-                                                        window.location.assign('http://testowodegateway.mydko-sarl.com/gateway.php/'+transaction+'/success');
+                                                        window.location.assign('http://testowodegateway.mydko-sarl.com/payment.php/success');
                                                 }
                                             })
                                     }
@@ -72,7 +72,7 @@
                                             if(data.data.data.errorMessage == 'Blocked'){
                                                 $('.vbox-overlay').addClass('d-none')
                                                 /*router.push('/payment.php/echec')*/
-                                                window.location.assign('http://testowodegateway.mydko-sarl.com/gateway.php/'+transaction+'/echec')
+                                                window.location.assign('http://testowodegateway.mydko-sarl.com/payment.php/echec')
                                          }
                                         })
                                     }

@@ -10,16 +10,45 @@ if (!empty($_GET['push'])) {
     $cipher_algo = 'AES-256-CBC';
     $tag_length = 16;
     $option = 0;
-    $encryption_key = constant('_SALT_');                    
+    $encryption_key = '9BE8C3B8-7307280C-DAFDC8A4-20F496D9-B7CD';                    
     $ivlen = openssl_cipher_iv_length($cipher_algo);
     $iv = '1234567896547896';                                     
-    $decrypt =json_decode(base64_decode(openssl_decrypt($_GET['push'], $cipher_algo, $encryption_key, $option,  $iv , $tag_length)));
+    $decrypt =json_decode(base64_decode(openssl_decrypt(trim($_GET['push']), $cipher_algo, $encryption_key, $option,  $iv , $tag_length)));
 
+    
     if (!empty($decrypt->secret)) {
+        
         $transaction = new Request();
         $user = $transaction->VerifyPaymentPush($decrypt->secret,$decrypt->amount,$decrypt->receiver);
+        
         response(200,"Transaction Found",$user);
     }
+    response(200,"Transaction Found",$_GET['push']);
+}
+
+if (!empty($_GET['epargne'])) {
+    // $data = $encode_data;
+    // $cipher_algo = 'AES-256-CBC';
+    // $tag_length = 16;
+    // $option = 0;
+    // $encryption_key = '9BE8C3B8-7307280C-DAFDC8A4-20F496D9-B7CD';                    
+    // $ivlen = openssl_cipher_iv_length($cipher_algo);
+    // $iv = '1234567896547896';                                     
+    // $decrypt =json_decode(base64_decode(openssl_decrypt(trim($_GET['push']), $cipher_algo, $encryption_key, $option,  $iv , $tag_length)));
+
+    $decrypt = json_decode(base64_decode($_GET['epargne']));
+    
+    if (!empty($decrypt->secret)) {
+        
+        $transaction = new Request();
+        $user = $transaction->VerifyPaymentPush($decrypt->secret,$decrypt->amount,$decrypt->receiver);
+        
+        response(200,"Transaction Found",$user);
+    }
+    else{
+        response(600,"Transaction Found",'Erreur. Les données ne sont pas correcte.');
+    }
+    
 }
 
 if(!empty($_GET['request']))
@@ -41,7 +70,7 @@ if(!empty($_GET['request']))
 
     if ($data_payment->action == "payment" && !empty($data_payment->action)) {
         $transaction = new Request();
-        $user = $transaction->TransferMoneyToUser($data_payment->user,$data_payment->receiver,$data_payment->amount,$data_payment->currencie,$data_payment->note,$data_payment->transaction_type);
+        $user = $transaction->PaymentMoneyToUser($data_payment->secret,$data_payment->amount,$data_payment->currencie);
         response(200,"User Found",$user);
     }
 

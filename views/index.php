@@ -1,8 +1,6 @@
 <?php 
 
 session_start();
-
-
 // Include header file
 include 'header.php';
 ?>
@@ -14,8 +12,42 @@ $uri   = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
 
 $url = 'http://owode-api.bj/api/v1/';
 
+$data_payment = json_decode(base64_decode($_GET['payment']));
+
+if (isset($_POST['guest'])) {
+    
+    $data = array(
+        "currencie" => $data_payment->currencie,
+        "amount" => $data_payment->amount,
+        "transaction_type_id" => $data_payment->transaction_type_id,
+        "secret"=>$data_payment->secret
+    );
+    $data_json = http_build_query($data);
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url.'merchants/payment');
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS,$data_json);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $response  = curl_exec($ch);
+    curl_close($ch);
+    
+    $user = json_decode($response,JSON_OBJECT_AS_ARRAY);
+    $_SESSION['amount'] = $data_payment->amount;
+    $_SESSION['receiver'] = $data_payment->receiver;
+
+    //echo json_encode(['payment_link'=>$user['link'],'ErrorMessage'=>$user['errorMessage']]);
+    header('Location:'.$user['link']);
+    exit();
+
+    /*header('Location:'.$user['link']);
+    exit;*/
+    /*var_dump($user['link']);
+    exit();*/
+}
+
 if (!empty($_GET['payment'])) {
-    $data_payment = json_decode(base64_decode($_GET['payment']));
+    //$data_payment = json_decode(base64_decode($_GET['payment']));
+    //$data_payment = json_decode(base64_decode($_GET['payment']));
     // User data to send using HTTP POST method in curl
     $data = array('user'=>$data_payment->receiver);
     $data_json = http_build_query($data);
@@ -31,11 +63,10 @@ if (!empty($_GET['payment'])) {
     $_SESSION['amount'] = $data_payment->amount;
     $_SESSION['receiver'] = $data_payment->receiver;
     $_SESSION['motif'] = $data_payment->note;
-    $_SESSION['receiver_name'] = $user['user']['first_name'].' '.$user['user']['last_name'];
-    
+    $_SESSION['receiver_name'] = $user['user']['first_name'].' '.$user['user']['last_name'];    
 }
 
- if (!empty($_POST['phone'] && !empty($_POST['password']))) {
+ /*if (!empty($_POST['phone'] && !empty($_POST['password']))) {
 
     $data = array('contact'=>$_POST['phone'],'password'=>$_POST['password']);
     $data_json = http_build_query($data);
@@ -57,7 +88,7 @@ if (!empty($_GET['payment'])) {
     }else {
         $message = $user->errorMessage;
     } 
- }
+ }*/
 ?>
 <!-- Page HTML Start here -->
 <!DOCTYPE html>
@@ -129,7 +160,9 @@ if (!empty($_GET['payment'])) {
                         </div>
                         <hr class="mb-4">
                         <div class="mb-3">
-                            <a class="btn bg-gris btn-lg btn-block" href="register.php">Créer un compte</a>
+                            <form action="" method="post">
+                                <button type="submit" name="guest" class="btn bg-gris btn-lg btn-block" style="background-color: #f8f9fa;">Payer en tant qu'invité</button>
+                            </form>
                         </div>
                     </div>
                 </div>
